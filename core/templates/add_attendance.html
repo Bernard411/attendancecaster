@@ -1,0 +1,24 @@
+<form method="post">
+    {% csrf_token %}
+    <label for="student_id">Student:</label>
+    <select name="student_id" required>
+        {% for student in students %}
+            <option value="{{ student.id }}">{{ student.name }}</option>
+        {% endfor %}
+    </select>
+    <br>
+    <label for="subject_id">Subject:</label>
+    <select name="subject_id" required>
+        {% for subject in subjects %}
+            <option value="{{ subject.id }}">{{ subject.name }}</option>
+        {% endfor %}
+    </select>
+    <br>
+    <label for="date">Date:</label>
+    <input type="date" name="date" required>
+    <br>
+    <label for="status">Status (Present):</label>
+    <input type="checkbox" name="status">
+    <br>
+    <button type="submit">Add Attendance</button>
+</form>

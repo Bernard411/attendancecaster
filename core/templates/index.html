@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facial Recognition</title>
+</head>
+<body>
+    <h1>Facial Recognition Attendance</h1>
+    <video id="webcam" autoplay playsinline width="640" height="480"></video>
+    <canvas id="snapshot" width="640" height="480" style="display: none;"></canvas>
+    <button id="capture">Capture & Recognize</button>
+
+    <script>
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('snapshot');
+        const captureButton = document.getElementById('capture');
+
+        async function startWebcam() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (error) {
+                console.error('Error accessing webcam: ', error);
+            }
+        }
+
+        function captureImage() {
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataURL = canvas.toDataURL('image/jpeg');
+            return dataURL;
+        }
+
+        captureButton.addEventListener('click', async () => {
+            const imageData = captureImage();
+
+            // Send the image to the server for recognition
+            const response = await fetch('/recognize/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ image: imageData })
+            });
+
+            const result = await response.json();
+            alert(result.message);
+        });
+
+        startWebcam();
+    </script>
+</body>
+</html>
